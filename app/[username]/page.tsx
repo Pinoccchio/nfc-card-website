@@ -1,5 +1,4 @@
 import type React from "react"
-// Update the profile page to fetch data from Supabase
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import {
@@ -21,7 +20,8 @@ import {
   MessageCircle,
   Smartphone,
 } from "lucide-react"
-import { createServerSupabaseClient } from "@/lib/supabase-server"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -56,18 +56,34 @@ interface ProfilePageProps {
   }
 }
 
-export default async function ProfilePage({ params }: ProfilePageProps) {
-  const supabase = createServerSupabaseClient()
+export const revalidate = 0 // Disable caching for this page
 
-  // Try to find user by username
+export default async function ProfilePage({ params }: ProfilePageProps) {
+  // Create a Supabase client with server component client
+  const supabase = createServerComponentClient({ cookies })
+
+  // Try to find user by username - without requiring authentication
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("*, social_links(*), custom_links(*)")
     .eq("username", params.username)
     .single()
 
+  // If no profile is found, show 404
   if (error || !profile) {
+    console.error("Profile not found:", error)
     notFound()
+  }
+
+  // Track profile view (optional)
+  try {
+    await supabase.from("profile_views").insert({
+      profile_id: profile.id,
+      viewed_at: new Date().toISOString(),
+    })
+  } catch (viewError) {
+    // Silently fail if view tracking fails - don't block the page render
+    console.error("Failed to track view:", viewError)
   }
 
   return (
