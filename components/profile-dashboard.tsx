@@ -33,6 +33,8 @@ import {
   MessageCircle,
   Mail,
   Phone,
+  Menu,
+  X,
 } from "lucide-react"
 
 import { createClientSupabaseClient } from "@/lib/supabase-client"
@@ -107,6 +109,7 @@ export default function ProfileDashboardSimplified({
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState("")
   const [error, setError] = useState("")
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Profile state
   const [firstName, setFirstName] = useState(profile.first_name || "")
@@ -381,12 +384,23 @@ export default function ProfileDashboardSimplified({
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2">
-            <Smartphone className="h-6 w-6" />
-            <span className="text-xl font-bold">TapLink</span>
+            <Smartphone className="h-5 w-5 sm:h-6 sm:w-6" />
+            <span className="text-lg sm:text-xl font-bold">TapLink</span>
           </div>
-          <nav className="flex items-center gap-4">
+
+          {/* Mobile menu button */}
+          <button
+            className="md:hidden p-2"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+
+          {/* Desktop navigation */}
+          <nav className="hidden md:flex items-center gap-4">
             <Button variant="ghost" size="sm" asChild>
               <Link href="/">
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -395,153 +409,223 @@ export default function ProfileDashboardSimplified({
             </Button>
             <ThemeToggle />
           </nav>
+
+          {/* Mobile navigation */}
+          {mobileMenuOpen && (
+            <div className="absolute top-16 left-0 right-0 bg-background border-b p-4 flex flex-col gap-2 md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="justify-start"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Link href="/">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Home
+                </Link>
+              </Button>
+              <div className="flex justify-end">
+                <ThemeToggle />
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
-      <main className="flex-1 py-8">
-        <div className="container">
-          <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <main className="flex-1 py-6 md:py-8 px-4 md:px-0">
+        <div className="container max-w-6xl">
+          <div className="mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">My Profile</h1>
-              <p className="text-muted-foreground">Customize your profile and manage your links</p>
+              <h1 className="text-2xl md:text-3xl font-bold">My Profile</h1>
+              <p className="text-sm md:text-base text-muted-foreground">Customize your profile and manage your links</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" asChild>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm h-8 sm:h-9">
                 <Link href={profileUrl} target="_blank">
-                  <Eye className="mr-2 h-4 w-4" />
+                  <Eye className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                   Preview
                 </Link>
               </Button>
-              <Button size="sm" onClick={handleUpdateProfile} disabled={loading}>
-                <Save className="mr-2 h-4 w-4" />
-                Save Changes
+              <Button
+                size="sm"
+                onClick={handleUpdateProfile}
+                disabled={loading}
+                className="text-xs sm:text-sm h-8 sm:h-9"
+              >
+                <Save className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                Save
               </Button>
             </div>
           </div>
 
-          {error && <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-md">{error}</div>}
+          {error && <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-md text-sm">{error}</div>}
 
-          {success && <div className="mb-4 p-3 bg-green-500/10 text-green-500 rounded-md">{success}</div>}
+          {success && <div className="mb-4 p-3 bg-green-500/10 text-green-500 rounded-md text-sm">{success}</div>}
 
-          <div className="grid gap-8 md:grid-cols-3">
-            <div className="md:col-span-2">
-              <Tabs defaultValue="profile">
-                <TabsList className="mb-4 grid w-full grid-cols-3">
-                  <TabsTrigger value="profile">Profile</TabsTrigger>
-                  <TabsTrigger value="social">Social Links</TabsTrigger>
-                  <TabsTrigger value="custom">Custom Links</TabsTrigger>
+          <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <Tabs defaultValue="profile" className="w-full">
+                <TabsList className="mb-4 grid w-full grid-cols-3 h-auto">
+                  <TabsTrigger value="profile" className="text-xs sm:text-sm py-1.5 sm:py-2">
+                    Profile
+                  </TabsTrigger>
+                  <TabsTrigger value="social" className="text-xs sm:text-sm py-1.5 sm:py-2">
+                    Social Links
+                  </TabsTrigger>
+                  <TabsTrigger value="custom" className="text-xs sm:text-sm py-1.5 sm:py-2">
+                    Custom Links
+                  </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="profile" className="space-y-4">
+                <TabsContent value="profile" className="space-y-4 mt-0">
                   <Card>
-                    <CardHeader>
-                      <CardTitle>Basic Information</CardTitle>
-                      <CardDescription>Update your profile information</CardDescription>
+                    <CardHeader className="p-4 sm:p-6">
+                      <CardTitle className="text-lg sm:text-xl">Basic Information</CardTitle>
+                      <CardDescription className="text-xs sm:text-sm">Update your profile information</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <CardContent className="space-y-4 p-4 sm:p-6 pt-0 sm:pt-0">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="first-name">First Name</Label>
-                          <Input id="first-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="last-name">Last Name</Label>
-                          <Input id="last-name" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="username">Username</Label>
-                        <div className="flex items-center">
-                          <span className="mr-2 text-sm text-muted-foreground">{WEBSITE_DOMAIN}/</span>
+                          <Label htmlFor="first-name" className="text-xs sm:text-sm">
+                            First Name
+                          </Label>
                           <Input
-                            id="username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder="your-username"
+                            id="first-name"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            className="h-8 sm:h-10 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="last-name" className="text-xs sm:text-sm">
+                            Last Name
+                          </Label>
+                          <Input
+                            id="last-name"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            className="h-8 sm:h-10 text-sm"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="bio">Bio</Label>
+                        <Label htmlFor="username" className="text-xs sm:text-sm">
+                          Username
+                        </Label>
+                        <div className="flex items-center">
+                          <span className="mr-2 text-xs sm:text-sm text-muted-foreground">{WEBSITE_DOMAIN}/</span>
+                          <Input
+                            id="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="your-username"
+                            className="h-8 sm:h-10 text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="bio" className="text-xs sm:text-sm">
+                          Bio
+                        </Label>
                         <Input
                           id="bio"
                           value={bio}
                           onChange={(e) => setBio(e.target.value)}
                           placeholder="Tell us about yourself"
+                          className="h-8 sm:h-10 text-sm"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="location">Location</Label>
+                        <Label htmlFor="location" className="text-xs sm:text-sm">
+                          Location
+                        </Label>
                         <Input
                           id="location"
                           value={location}
                           onChange={(e) => setLocation(e.target.value)}
                           placeholder="City, Country"
+                          className="h-8 sm:h-10 text-sm"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number</Label>
+                        <Label htmlFor="phone" className="text-xs sm:text-sm">
+                          Phone Number
+                        </Label>
                         <Input
                           id="phone"
                           type="tel"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="+639123456789"
+                          className="h-8 sm:h-10 text-sm"
                         />
                       </div>
                     </CardContent>
                   </Card>
                 </TabsContent>
 
-                <TabsContent value="social" className="space-y-4">
+                <TabsContent value="social" className="space-y-4 mt-0">
                   <Card>
-                    <CardHeader>
-                      <CardTitle>Social Media Links</CardTitle>
-                      <CardDescription>Connect your social media accounts</CardDescription>
+                    <CardHeader className="p-4 sm:p-6">
+                      <CardTitle className="text-lg sm:text-xl">Social Media Links</CardTitle>
+                      <CardDescription className="text-xs sm:text-sm">
+                        Connect your social media accounts
+                      </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4 p-4 sm:p-6 pt-0 sm:pt-0">
                       {userSocialLinks.length > 0 ? (
                         <div className="space-y-3">
                           {userSocialLinks.map((link) => (
-                            <div key={link.id} className="flex items-center justify-between p-3 border rounded-md">
-                              <div className="flex items-center">
-                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                            <div
+                              key={link.id}
+                              className="flex items-center justify-between p-2 sm:p-3 border rounded-md"
+                            >
+                              <div className="flex items-center overflow-hidden">
+                                <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-primary/10 flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
                                   {getPlatformIcon(link.platform)}
                                 </div>
-                                <div>
-                                  <p className="font-medium">
+                                <div className="min-w-0">
+                                  <p className="font-medium text-xs sm:text-sm truncate">
                                     {SOCIAL_PLATFORMS.find((p) => p.id === link.platform)?.name || link.platform}
                                   </p>
-                                  <p className="text-sm text-muted-foreground truncate max-w-[200px]">
+                                  <p className="text-xs text-muted-foreground truncate max-w-[150px] sm:max-w-[200px]">
                                     {link.display_name || link.url}
                                   </p>
                                 </div>
                               </div>
-                              <Button variant="ghost" size="icon" onClick={() => handleDeleteSocialLink(link.id)}>
-                                <Trash2 className="h-4 w-4 text-destructive" />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteSocialLink(link.id)}
+                                className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0"
+                              >
+                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-destructive" />
                                 <span className="sr-only">Delete</span>
                               </Button>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div className="text-center py-4 text-muted-foreground">No social links added yet</div>
+                        <div className="text-center py-4 text-muted-foreground text-sm">No social links added yet</div>
                       )}
 
                       <div className="pt-4 border-t">
-                        <h3 className="font-medium mb-3">Add New Social Link</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <h3 className="font-medium mb-3 text-sm">Add New Social Link</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div className="space-y-2">
-                            <Label htmlFor="platform">Platform</Label>
+                            <Label htmlFor="platform" className="text-xs sm:text-sm">
+                              Platform
+                            </Label>
                             <select
                               id="platform"
                               value={newSocialPlatform}
                               onChange={(e) => setNewSocialPlatform(e.target.value)}
-                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                              className="flex h-8 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-1 sm:py-2 text-xs sm:text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                             >
                               <option value="">Select platform</option>
                               {SOCIAL_PLATFORMS.map((platform) => (
@@ -553,27 +637,37 @@ export default function ProfileDashboardSimplified({
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="display-name">Display Name (Optional)</Label>
+                            <Label htmlFor="display-name" className="text-xs sm:text-sm">
+                              Display Name (Optional)
+                            </Label>
                             <Input
                               id="display-name"
                               value={newSocialDisplayName}
                               onChange={(e) => setNewSocialDisplayName(e.target.value)}
                               placeholder="@username"
+                              className="h-8 sm:h-10 text-sm"
                             />
                           </div>
                         </div>
 
                         <div className="mt-3 space-y-2">
-                          <Label htmlFor="social-url">URL</Label>
+                          <Label htmlFor="social-url" className="text-xs sm:text-sm">
+                            URL
+                          </Label>
                           <div className="flex gap-2">
                             <Input
                               id="social-url"
                               value={newSocialUrl}
                               onChange={(e) => setNewSocialUrl(e.target.value)}
                               placeholder="https://..."
+                              className="h-8 sm:h-10 text-sm"
                             />
-                            <Button onClick={handleAddSocialLink} disabled={loading}>
-                              <Plus className="h-4 w-4 mr-2" />
+                            <Button
+                              onClick={handleAddSocialLink}
+                              disabled={loading}
+                              className="h-8 sm:h-10 text-xs sm:text-sm"
+                            >
+                              <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                               Add
                             </Button>
                           </div>
@@ -583,61 +677,81 @@ export default function ProfileDashboardSimplified({
                   </Card>
                 </TabsContent>
 
-                <TabsContent value="custom" className="space-y-4">
+                <TabsContent value="custom" className="space-y-4 mt-0">
                   <Card>
-                    <CardHeader>
-                      <CardTitle>Custom Links</CardTitle>
-                      <CardDescription>Add custom links to your profile</CardDescription>
+                    <CardHeader className="p-4 sm:p-6">
+                      <CardTitle className="text-lg sm:text-xl">Custom Links</CardTitle>
+                      <CardDescription className="text-xs sm:text-sm">Add custom links to your profile</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4 p-4 sm:p-6 pt-0 sm:pt-0">
                       {userCustomLinks.length > 0 ? (
                         <div className="space-y-3">
                           {userCustomLinks.map((link) => (
-                            <div key={link.id} className="flex items-center justify-between p-3 border rounded-md">
-                              <div className="flex items-center">
-                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                                  <LinkIcon className="h-4 w-4 text-primary" />
+                            <div
+                              key={link.id}
+                              className="flex items-center justify-between p-2 sm:p-3 border rounded-md"
+                            >
+                              <div className="flex items-center overflow-hidden">
+                                <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-primary/10 flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
+                                  <LinkIcon className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                                 </div>
-                                <div>
-                                  <p className="font-medium">{link.title}</p>
-                                  <p className="text-sm text-muted-foreground truncate max-w-[200px]">{link.url}</p>
+                                <div className="min-w-0">
+                                  <p className="font-medium text-xs sm:text-sm truncate">{link.title}</p>
+                                  <p className="text-xs text-muted-foreground truncate max-w-[150px] sm:max-w-[200px]">
+                                    {link.url}
+                                  </p>
                                 </div>
                               </div>
-                              <Button variant="ghost" size="icon" onClick={() => handleDeleteCustomLink(link.id)}>
-                                <Trash2 className="h-4 w-4 text-destructive" />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteCustomLink(link.id)}
+                                className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0"
+                              >
+                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-destructive" />
                                 <span className="sr-only">Delete</span>
                               </Button>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div className="text-center py-4 text-muted-foreground">No custom links added yet</div>
+                        <div className="text-center py-4 text-muted-foreground text-sm">No custom links added yet</div>
                       )}
 
                       <div className="pt-4 border-t">
-                        <h3 className="font-medium mb-3">Add New Custom Link</h3>
+                        <h3 className="font-medium mb-3 text-sm">Add New Custom Link</h3>
                         <div className="space-y-3">
                           <div className="space-y-2">
-                            <Label htmlFor="link-title">Title</Label>
+                            <Label htmlFor="link-title" className="text-xs sm:text-sm">
+                              Title
+                            </Label>
                             <Input
                               id="link-title"
                               value={newCustomTitle}
                               onChange={(e) => setNewCustomTitle(e.target.value)}
                               placeholder="My Website"
+                              className="h-8 sm:h-10 text-sm"
                             />
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="link-url">URL</Label>
+                            <Label htmlFor="link-url" className="text-xs sm:text-sm">
+                              URL
+                            </Label>
                             <div className="flex gap-2">
                               <Input
                                 id="link-url"
                                 value={newCustomUrl}
                                 onChange={(e) => setNewCustomUrl(e.target.value)}
                                 placeholder="https://..."
+                                className="h-8 sm:h-10 text-sm"
                               />
-                              <Button onClick={handleAddCustomLink} disabled={loading}>
-                                <Plus className="h-4 w-4 mr-2" />
+                              <Button
+                                onClick={handleAddCustomLink}
+                                disabled={loading}
+                                className="h-8 sm:h-10 text-xs sm:text-sm"
+                              >
+                                <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                                 Add
                               </Button>
                             </div>
@@ -650,14 +764,14 @@ export default function ProfileDashboardSimplified({
               </Tabs>
             </div>
 
-            <div>
-              <h2 className="text-xl font-bold mb-4">Profile Preview</h2>
+            <div className="space-y-6">
+              <h2 className="text-lg sm:text-xl font-bold mb-3">Profile Preview</h2>
               <Card className="overflow-hidden">
-                <div className="bg-gradient-to-b from-primary/20 to-background h-24"></div>
+                <div className="bg-gradient-to-b from-primary/20 to-background h-20 sm:h-24"></div>
                 <div className="relative px-4">
-                  <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+                  <div className="absolute -top-10 sm:-top-12 left-1/2 transform -translate-x-1/2">
                     <div className="relative">
-                      <div className="h-24 w-24 rounded-full border-4 border-background overflow-hidden bg-muted">
+                      <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full border-4 border-background overflow-hidden bg-muted">
                         {avatarUrl ? (
                           <Image
                             src={avatarUrl || "/placeholder.svg"}
@@ -668,14 +782,14 @@ export default function ProfileDashboardSimplified({
                             unoptimized // Add this to avoid Next.js image optimization issues with Supabase URLs
                           />
                         ) : (
-                          <User className="h-12 w-12 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-muted-foreground" />
+                          <User className="h-10 w-10 sm:h-12 sm:w-12 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-muted-foreground" />
                         )}
                       </div>
                       <label
                         htmlFor="avatar-upload"
-                        className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-primary flex items-center justify-center cursor-pointer"
+                        className="absolute bottom-0 right-0 h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-primary flex items-center justify-center cursor-pointer"
                       >
-                        <ImagePlus className="h-4 w-4 text-primary-foreground" />
+                        <ImagePlus className="h-3 w-3 sm:h-4 sm:w-4 text-primary-foreground" />
                         <input
                           id="avatar-upload"
                           type="file"
@@ -687,32 +801,32 @@ export default function ProfileDashboardSimplified({
                     </div>
                   </div>
                 </div>
-                <CardContent className="pt-16 text-center">
-                  <h3 className="text-xl font-bold">
+                <CardContent className="pt-12 sm:pt-16 text-center">
+                  <h3 className="text-lg sm:text-xl font-bold">
                     {firstName || lastName ? `${firstName} ${lastName}` : "Your Name"}
                   </h3>
-                  <p className="text-muted-foreground mt-1">{bio || "Your bio will appear here"}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">{bio || "Your bio will appear here"}</p>
                   {location && (
-                    <div className="flex items-center justify-center mt-2 text-sm text-muted-foreground">
+                    <div className="flex items-center justify-center mt-2 text-xs text-muted-foreground">
                       <MapPin className="h-3 w-3 mr-1" />
                       {location}
                     </div>
                   )}
                   {phone && (
-                    <div className="flex items-center justify-center mt-2 text-sm text-muted-foreground">
+                    <div className="flex items-center justify-center mt-2 text-xs text-muted-foreground">
                       <Phone className="h-3 w-3 mr-1" />
                       {phone}
                     </div>
                   )}
                 </CardContent>
-                <CardFooter className="flex flex-col gap-3 border-t pt-4">
+                <CardFooter className="flex flex-col gap-3 border-t pt-4 p-4">
                   <div className="w-full">
-                    <p className="text-sm font-medium mb-2">Your profile link:</p>
+                    <p className="text-xs sm:text-sm font-medium mb-2">Your profile link:</p>
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 truncate bg-muted p-2 rounded-md text-sm">{fullProfileUrl}</div>
-                      <Button variant="ghost" size="icon" asChild>
+                      <div className="flex-1 truncate bg-muted p-2 rounded-md text-xs sm:text-sm">{fullProfileUrl}</div>
+                      <Button variant="ghost" size="icon" asChild className="h-8 w-8">
                         <a href={fullProfileUrl} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4" />
+                          <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
                         </a>
                       </Button>
                     </div>
@@ -722,18 +836,18 @@ export default function ProfileDashboardSimplified({
 
               {/* Social Media Icons Preview */}
               {userSocialLinks.length > 0 && (
-                <Card className="mt-6">
-                  <CardHeader>
-                    <CardTitle className="text-base">Social Media Preview</CardTitle>
+                <Card>
+                  <CardHeader className="p-4">
+                    <CardTitle className="text-sm sm:text-base">Social Media Preview</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-3 justify-center">
+                  <CardContent className="p-4 pt-0">
+                    <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
                       {userSocialLinks.map((link) => (
                         <div key={link.id} className="flex flex-col items-center">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
+                          <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
                             {getPlatformIcon(link.platform)}
                           </div>
-                          <span className="text-xs mt-1">
+                          <span className="text-[10px] sm:text-xs mt-1 max-w-[50px] truncate text-center">
                             {SOCIAL_PLATFORMS.find((p) => p.id === link.platform)?.name.split(" ")[0] || link.platform}
                           </span>
                         </div>
@@ -744,22 +858,22 @@ export default function ProfileDashboardSimplified({
               )}
 
               <div className="mt-6">
-                <h3 className="font-medium mb-3">Quick Tips</h3>
-                <ul className="space-y-2 text-sm">
+                <h3 className="font-medium mb-3 text-sm sm:text-base">Quick Tips</h3>
+                <ul className="space-y-2 text-xs sm:text-sm">
                   <li className="flex items-start">
-                    <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 mt-0.5" />
                     <span>Add a profile picture to make your profile more personal</span>
                   </li>
                   <li className="flex items-start">
-                    <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 mt-0.5" />
                     <span>Write a short bio that describes who you are</span>
                   </li>
                   <li className="flex items-start">
-                    <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 mt-0.5" />
                     <span>Add your most important social media links</span>
                   </li>
                   <li className="flex items-start">
-                    <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 mt-0.5" />
                     <span>Choose a memorable username for your profile URL</span>
                   </li>
                 </ul>
