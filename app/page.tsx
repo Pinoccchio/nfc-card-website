@@ -188,7 +188,7 @@ export default function HomePage() {
                   <p className="text-gray-500 dark:text-gray-400">For individuals just getting started</p>
                 </div>
                 <div className="my-6">
-                  <span className="text-4xl font-bold dark:text-white">$9.99</span>
+                  <span className="text-4xl font-bold dark:text-white">₱499</span>
                   <span className="text-gray-500 dark:text-gray-400">/month</span>
                 </div>
                 <ul className="space-y-2">
@@ -252,7 +252,7 @@ export default function HomePage() {
                   <p className="text-primary-foreground/80">For professionals and creators</p>
                 </div>
                 <div className="my-6">
-                  <span className="text-4xl font-bold text-primary-foreground">$19.99</span>
+                  <span className="text-4xl font-bold text-primary-foreground">₱999</span>
                   <span className="text-primary-foreground/80">/month</span>
                 </div>
                 <ul className="space-y-2 text-primary-foreground">
@@ -333,7 +333,7 @@ export default function HomePage() {
                   <p className="text-gray-500 dark:text-gray-400">For teams and businesses</p>
                 </div>
                 <div className="my-6">
-                  <span className="text-4xl font-bold dark:text-white">$49.99</span>
+                  <span className="text-4xl font-bold dark:text-white">₱2,499</span>
                   <span className="text-gray-500 dark:text-gray-400">/month</span>
                 </div>
                 <ul className="space-y-2">

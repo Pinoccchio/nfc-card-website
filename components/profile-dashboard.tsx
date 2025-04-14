@@ -487,7 +487,6 @@ export default function ProfileDashboardSimplified({
                         <Label htmlFor="phone">Phone Number</Label>
                         <Input
                           id="phone"
-                          id="phone"
                           type="tel"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
