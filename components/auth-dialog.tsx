@@ -3,11 +3,13 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Eye, EyeOff, User } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { createClientSupabaseClient } from "@/lib/supabase-client"
+import { redirectAfterAuth } from "@/lib/auth-utils"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -28,6 +30,7 @@ interface AuthDialogProps {
 }
 
 export function AuthDialog({ children, type = "signin", className }: AuthDialogProps) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<string>(type)
   const [email, setEmail] = useState("")
@@ -75,11 +78,11 @@ export function AuthDialog({ children, type = "signin", className }: AuthDialogP
 
       setSuccess("Signed in successfully!")
 
-      // Close the dialog after a short delay
-      setTimeout(() => {
+      // Close the dialog after a short delay and redirect
+      setTimeout(async () => {
         setOpen(false)
-        // Redirect based on role would happen here in the future
-        window.location.reload() // Optional: reload the page to update the UI
+        const redirectPath = await redirectAfterAuth()
+        router.push(redirectPath)
       }, 1000)
     } catch (error: any) {
       setError(error.message || "An error occurred during sign in")
@@ -117,8 +120,20 @@ export function AuthDialog({ children, type = "signin", className }: AuthDialogP
 
       if (error) throw error
 
-      // The profile will be created automatically by the database trigger
-      // We don't need to manually create it anymore
+      // Manually create the profile entry as a fallback
+      if (data.user) {
+        const { error: profileError } = await supabase.from("profiles").upsert({
+          id: data.user.id,
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          role: userRole,
+        })
+
+        if (profileError) {
+          console.error("Error creating profile:", profileError)
+        }
+      }
 
       setSuccess("Account created successfully! Please check your email to confirm your account.")
 

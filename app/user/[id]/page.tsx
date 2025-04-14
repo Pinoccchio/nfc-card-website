@@ -1,69 +1,25 @@
-import type React from "react"
-// Update the profile page to fetch data from Supabase
 import Image from "next/image"
 import { notFound } from "next/navigation"
-import {
-  ExternalLink,
-  Mail,
-  MapPin,
-  Phone,
-  Globe,
-  Twitter,
-  Instagram,
-  Facebook,
-  Linkedin,
-  Github,
-  Youtube,
-  Music,
-  Dribbble,
-  Figma,
-  Twitch,
-  MessageCircle,
-  Smartphone,
-} from "lucide-react"
+import { ExternalLink, Globe, Mail, MapPin, Phone, Smartphone } from "lucide-react"
 import { createServerSupabaseClient } from "@/lib/supabase-server"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
-// Function to get icon component by platform ID
-const getPlatformIcon = (platformId: string) => {
-  const iconMap: Record<string, React.ReactNode> = {
-    twitter: <Twitter className="h-6 w-6 text-primary" />,
-    instagram: <Instagram className="h-6 w-6 text-primary" />,
-    facebook: <Facebook className="h-6 w-6 text-primary" />,
-    linkedin: <Linkedin className="h-6 w-6 text-primary" />,
-    github: <Github className="h-6 w-6 text-primary" />,
-    youtube: <Youtube className="h-6 w-6 text-primary" />,
-    tiktok: <Music className="h-6 w-6 text-primary" />,
-    dribbble: <Dribbble className="h-6 w-6 text-primary" />,
-    behance: <Figma className="h-6 w-6 text-primary" />,
-    medium: <MessageCircle className="h-6 w-6 text-primary" />,
-    twitch: <Twitch className="h-6 w-6 text-primary" />,
-    discord: <MessageCircle className="h-6 w-6 text-primary" />,
-    website: <Globe className="h-6 w-6 text-primary" />,
-    email: <Mail className="h-6 w-6 text-primary" />,
-    whatsapp: <Phone className="h-6 w-6 text-primary" />,
-    telegram: <MessageCircle className="h-6 w-6 text-primary" />,
-  }
-
-  return iconMap[platformId] || <Globe className="h-6 w-6 text-primary" />
-}
-
-interface ProfilePageProps {
+interface UserProfilePageProps {
   params: {
-    username: string
+    id: string
   }
 }
 
-export default async function ProfilePage({ params }: ProfilePageProps) {
+export default async function UserProfilePage({ params }: UserProfilePageProps) {
   const supabase = createServerSupabaseClient()
 
-  // Try to find user by username
+  // Try to find user by ID
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("*, social_links(*), custom_links(*)")
-    .eq("username", params.username)
+    .eq("id", params.id)
     .single()
 
   if (error || !profile) {
@@ -115,9 +71,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 className="flex flex-col items-center"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 shadow-sm transition-transform hover:scale-110">
-                  {getPlatformIcon(social.platform)}
+                  <Globe className="h-6 w-6 text-primary" />
                 </div>
-                <span className="mt-1 text-xs">{social.display_name || social.platform}</span>
+                <span className="mt-1 text-xs">{social.platform}</span>
               </a>
             ))}
           </div>
