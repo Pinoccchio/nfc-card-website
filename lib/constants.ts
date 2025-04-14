@@ -1,7 +1,7 @@
 // Website configuration
 export const WEBSITE_DOMAIN =
   process.env.NODE_ENV === "production"
-    ? "yourwebsite.com" // Replace with your actual domain for production
+    ? "nfc-card-website.vercel.app" // Actual production domain
     : "localhost:3000" // Development domain with port
 
 export const WEBSITE_NAME = "NFC Card" // Replace with your website name
